@@ -109,7 +109,7 @@ func (a *adapter) Zone(ctx context.Context, name string) (dnsprovider.Zone, erro
 
 // Records lists the records of the zone's RRsets the token covers that
 // match f, one Record per value, without the SOA serial, which the
-// Gateway does not report, Partial as the Gateway sets it. The token
+// Gateway does not report. Partial is as the Gateway sets it. The token
 // needs list on records in the zone.
 func (a *adapter) Records(ctx context.Context, zone dnsprovider.Zone, f dnsprovider.RecordFilter) (dnsprovider.RecordSet, error) {
 	resp, err := a.client.ListRecords(ctx, &dnsgatev1.ListRecordsRequest{Token: a.token, Egress: a.egress, Zone: zone.Name})

@@ -1993,7 +1993,8 @@ type ListZonesResponse struct {
 	Zones []*Zone                `protobuf:"bytes,1,rep,name=zones,proto3" json:"zones,omitempty"`
 	// partial marks a Partial View: the token's Permissions do not cover
 	// every zone. It does not mean any zone was left out. False, the
-	// default, is a Full View.
+	// default, is a Full View, so older Gateways and clients keep today's
+	// meaning.
 	Partial       bool `protobuf:"varint,2,opt,name=partial,proto3" json:"partial,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -2286,7 +2287,8 @@ type ListRecordsResponse struct {
 	RecordSets []*RecordSet           `protobuf:"bytes,1,rep,name=record_sets,json=recordSets,proto3" json:"record_sets,omitempty"`
 	// partial marks a Partial View: the token's Permissions do not cover
 	// every name and type in the zone. It does not mean any RRset was left
-	// out. False, the default, is a Full View.
+	// out. False, the default, is a Full View, so older Gateways and
+	// clients keep today's meaning.
 	Partial       bool `protobuf:"varint,2,opt,name=partial,proto3" json:"partial,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
