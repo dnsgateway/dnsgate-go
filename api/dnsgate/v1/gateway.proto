@@ -291,6 +291,10 @@ message ListZonesRequest {
 // out.
 message ListZonesResponse {
   repeated Zone zones = 1;
+  // partial marks a Partial View: the token's Permissions do not cover
+  // every zone. It does not mean any zone was left out. False, the
+  // default, is a Full View.
+  bool partial = 2;
 }
 
 // GetZoneRequest asks for one zone. It needs get on zones.
@@ -343,6 +347,10 @@ message ListRecordsRequest {
 // are left out.
 message ListRecordsResponse {
   repeated RecordSet record_sets = 1;
+  // partial marks a Partial View: the token's Permissions do not cover
+  // every name and type in the zone. It does not mean any RRset was left
+  // out. False, the default, is a Full View.
+  bool partial = 2;
 }
 
 // GetRecordRequest asks for one RRset: every record of a name and type.

@@ -1989,8 +1989,12 @@ func (x *ListZonesRequest) GetEgress() Egress {
 // ListZonesResponse lists the zones the token covers; the others are left
 // out.
 type ListZonesResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Zones         []*Zone                `protobuf:"bytes,1,rep,name=zones,proto3" json:"zones,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Zones []*Zone                `protobuf:"bytes,1,rep,name=zones,proto3" json:"zones,omitempty"`
+	// partial marks a Partial View: the token's Permissions do not cover
+	// every zone. It does not mean any zone was left out. False, the
+	// default, is a Full View.
+	Partial       bool `protobuf:"varint,2,opt,name=partial,proto3" json:"partial,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2030,6 +2034,13 @@ func (x *ListZonesResponse) GetZones() []*Zone {
 		return x.Zones
 	}
 	return nil
+}
+
+func (x *ListZonesResponse) GetPartial() bool {
+	if x != nil {
+		return x.Partial
+	}
+	return false
 }
 
 // GetZoneRequest asks for one zone. It needs get on zones.
@@ -2271,8 +2282,12 @@ func (x *ListRecordsRequest) GetZone() string {
 // ListRecordsResponse lists the zone's RRsets the token covers; the others
 // are left out.
 type ListRecordsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	RecordSets    []*RecordSet           `protobuf:"bytes,1,rep,name=record_sets,json=recordSets,proto3" json:"record_sets,omitempty"`
+	state      protoimpl.MessageState `protogen:"open.v1"`
+	RecordSets []*RecordSet           `protobuf:"bytes,1,rep,name=record_sets,json=recordSets,proto3" json:"record_sets,omitempty"`
+	// partial marks a Partial View: the token's Permissions do not cover
+	// every name and type in the zone. It does not mean any RRset was left
+	// out. False, the default, is a Full View.
+	Partial       bool `protobuf:"varint,2,opt,name=partial,proto3" json:"partial,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2312,6 +2327,13 @@ func (x *ListRecordsResponse) GetRecordSets() []*RecordSet {
 		return x.RecordSets
 	}
 	return nil
+}
+
+func (x *ListRecordsResponse) GetPartial() bool {
+	if x != nil {
+		return x.Partial
+	}
+	return false
 }
 
 // GetRecordRequest asks for one RRset: every record of a name and type.
@@ -3520,9 +3542,10 @@ const file_dnsgate_v1_gateway_proto_rawDesc = "" +
 	"\x03jti\x18\x01 \x01(\tR\x03jti\"T\n" +
 	"\x10ListZonesRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12*\n" +
-	"\x06egress\x18\x02 \x01(\x0e2\x12.dnsgate.v1.EgressR\x06egress\";\n" +
+	"\x06egress\x18\x02 \x01(\x0e2\x12.dnsgate.v1.EgressR\x06egress\"U\n" +
 	"\x11ListZonesResponse\x12&\n" +
-	"\x05zones\x18\x01 \x03(\v2\x10.dnsgate.v1.ZoneR\x05zones\"f\n" +
+	"\x05zones\x18\x01 \x03(\v2\x10.dnsgate.v1.ZoneR\x05zones\x12\x18\n" +
+	"\apartial\x18\x02 \x01(\bR\apartial\"f\n" +
 	"\x0eGetZoneRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12*\n" +
 	"\x06egress\x18\x02 \x01(\x0e2\x12.dnsgate.v1.EgressR\x06egress\x12\x12\n" +
@@ -3541,10 +3564,11 @@ const file_dnsgate_v1_gateway_proto_rawDesc = "" +
 	"\x12ListRecordsRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12*\n" +
 	"\x06egress\x18\x02 \x01(\x0e2\x12.dnsgate.v1.EgressR\x06egress\x12\x12\n" +
-	"\x04zone\x18\x03 \x01(\tR\x04zone\"M\n" +
+	"\x04zone\x18\x03 \x01(\tR\x04zone\"g\n" +
 	"\x13ListRecordsResponse\x126\n" +
 	"\vrecord_sets\x18\x01 \x03(\v2\x15.dnsgate.v1.RecordSetR\n" +
-	"recordSets\"\x90\x01\n" +
+	"recordSets\x12\x18\n" +
+	"\apartial\x18\x02 \x01(\bR\apartial\"\x90\x01\n" +
 	"\x10GetRecordRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12*\n" +
 	"\x06egress\x18\x02 \x01(\x0e2\x12.dnsgate.v1.EgressR\x06egress\x12\x12\n" +
