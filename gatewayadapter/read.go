@@ -78,19 +78,19 @@ func zoneOf(z *dnsgatev1.Zone) dnsprovider.Zone {
 	return dnsprovider.Zone{ID: z.GetName(), Name: z.GetName(), State: states[z.GetState()], Nameservers: ns}
 }
 
-// Zones lists the zones the token covers that match f. The token needs
-// list on zones.
-func (a *adapter) Zones(ctx context.Context, f dnsprovider.ZoneFilter) ([]dnsprovider.Zone, error) {
+// Zones lists the zones the token covers that match f, Partial as the
+// Gateway sets it. The token needs list on zones.
+func (a *adapter) Zones(ctx context.Context, f dnsprovider.ZoneFilter) (dnsprovider.ZoneSet, error) {
 	resp, err := a.client.ListZones(ctx, &dnsgatev1.ListZonesRequest{Token: a.token, Egress: a.egress})
 	if err != nil {
-		return nil, providerError(ctx, err)
+		return dnsprovider.ZoneSet{}, providerError(ctx, err)
 	}
 
-	var out []dnsprovider.Zone
+	out := dnsprovider.ZoneSet{Partial: resp.GetPartial()}
 
 	for _, z := range resp.GetZones() {
 		if zone := zoneOf(z); dnsprovider.MatchZone(f, zone) {
-			out = append(out, zone)
+			out.Zones = append(out.Zones, zone)
 		}
 	}
 
@@ -109,14 +109,15 @@ func (a *adapter) Zone(ctx context.Context, name string) (dnsprovider.Zone, erro
 
 // Records lists the records of the zone's RRsets the token covers that
 // match f, one Record per value, without the SOA serial, which the
-// Gateway does not report. The token needs list on records in the zone.
+// Gateway does not report, Partial as the Gateway sets it. The token
+// needs list on records in the zone.
 func (a *adapter) Records(ctx context.Context, zone dnsprovider.Zone, f dnsprovider.RecordFilter) (dnsprovider.RecordSet, error) {
 	resp, err := a.client.ListRecords(ctx, &dnsgatev1.ListRecordsRequest{Token: a.token, Egress: a.egress, Zone: zone.Name})
 	if err != nil {
 		return dnsprovider.RecordSet{}, providerError(ctx, err)
 	}
 
-	var out dnsprovider.RecordSet
+	out := dnsprovider.RecordSet{Partial: resp.GetPartial()}
 
 	for _, set := range resp.GetRecordSets() {
 		for _, r := range recordsOf(zone.Name, set) {

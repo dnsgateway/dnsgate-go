@@ -3,7 +3,7 @@ module github.com/dnsgateway/dnsgate-go
 go 1.26
 
 require (
-	github.com/dnsgateway/dnsprovider v0.0.0-20261010081524-44743bbc29c4
+	github.com/dnsgateway/dnsprovider v0.0.0-20261010135532-454b5a0d851c
 	google.golang.org/grpc v1.84.0
 	google.golang.org/protobuf v1.36.12
 )
