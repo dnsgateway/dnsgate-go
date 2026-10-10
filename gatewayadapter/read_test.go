@@ -67,45 +67,55 @@ func adapterFor(t *testing.T, gw dnsgatev1.GatewayServiceServer) *adapter {
 }
 
 func TestRecordsCarryThePartialViewFlag(t *testing.T) {
-	for _, partial := range []bool{true, false} {
-		gw := &listingGateway{records: &dnsgatev1.ListRecordsResponse{
-			RecordSets: []*dnsgatev1.RecordSet{{Name: "www", Type: "A", Ttl: 300, Records: []*dnsgatev1.RecordValue{{Value: "192.0.2.1"}}}},
-			Partial:    partial,
-		}}
+	for name, partial := range map[string]bool{
+		"partial view": true,
+		"full view":    false,
+	} {
+		t.Run(name, func(t *testing.T) {
+			gw := &listingGateway{records: &dnsgatev1.ListRecordsResponse{
+				RecordSets: []*dnsgatev1.RecordSet{{Name: "www", Type: "A", Ttl: 300, Records: []*dnsgatev1.RecordValue{{Value: "192.0.2.1"}}}},
+				Partial:    partial,
+			}}
 
-		got, err := adapterFor(t, gw).Records(t.Context(), dnsprovider.Zone{ID: "example.com", Name: "example.com"}, dnsprovider.RecordFilter{})
-		if err != nil {
-			t.Fatalf("Records: %v", err)
-		}
+			got, err := adapterFor(t, gw).Records(t.Context(), dnsprovider.Zone{ID: "example.com", Name: "example.com"}, dnsprovider.RecordFilter{})
+			if err != nil {
+				t.Fatalf("Records: %v", err)
+			}
 
-		if got.Partial != partial {
-			t.Errorf("Records of a response with partial %v: Partial = %v", partial, got.Partial)
-		}
+			if got.Partial != partial {
+				t.Errorf("Records of a response with partial %v: Partial = %v", partial, got.Partial)
+			}
 
-		if len(got.Records) != 1 || got.Records[0].Name != "www.example.com" {
-			t.Errorf("Records = %+v, want the one www.example.com record", got.Records)
-		}
+			if len(got.Records) != 1 || got.Records[0].Name != "www.example.com" {
+				t.Errorf("Records = %+v, want the one www.example.com record", got.Records)
+			}
+		})
 	}
 }
 
 func TestZonesCarryThePartialViewFlag(t *testing.T) {
-	for _, partial := range []bool{true, false} {
-		gw := &listingGateway{zones: &dnsgatev1.ListZonesResponse{
-			Zones:   []*dnsgatev1.Zone{{Name: "example.com", State: dnsgatev1.Zone_STATE_ACTIVE}},
-			Partial: partial,
-		}}
+	for name, partial := range map[string]bool{
+		"partial view": true,
+		"full view":    false,
+	} {
+		t.Run(name, func(t *testing.T) {
+			gw := &listingGateway{zones: &dnsgatev1.ListZonesResponse{
+				Zones:   []*dnsgatev1.Zone{{Name: "example.com", State: dnsgatev1.Zone_STATE_ACTIVE}},
+				Partial: partial,
+			}}
 
-		got, err := adapterFor(t, gw).Zones(t.Context(), dnsprovider.ZoneFilter{})
-		if err != nil {
-			t.Fatalf("Zones: %v", err)
-		}
+			got, err := adapterFor(t, gw).Zones(t.Context(), dnsprovider.ZoneFilter{})
+			if err != nil {
+				t.Fatalf("Zones: %v", err)
+			}
 
-		if got.Partial != partial {
-			t.Errorf("Zones of a response with partial %v: Partial = %v", partial, got.Partial)
-		}
+			if got.Partial != partial {
+				t.Errorf("Zones of a response with partial %v: Partial = %v", partial, got.Partial)
+			}
 
-		if len(got.Zones) != 1 || got.Zones[0].Name != "example.com" {
-			t.Errorf("Zones = %+v, want example.com alone", got.Zones)
-		}
+			if len(got.Zones) != 1 || got.Zones[0].Name != "example.com" {
+				t.Errorf("Zones = %+v, want example.com alone", got.Zones)
+			}
+		})
 	}
 }
