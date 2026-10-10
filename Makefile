@@ -61,3 +61,7 @@ test: lint unit ## Run all tests
 .PHONY: licenses
 licenses:
 	go-licenses check ./... --disallowed_types=forbidden,restricted,unknown
+
+.PHONY: conformance
+conformance: ## Conformance
+	docker run --rm -it -v $(PWD):/src -w /src ghcr.io/siderolabs/conform:v0.1.0-alpha.31 enforce
