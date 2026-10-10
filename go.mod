@@ -19,5 +19,3 @@ require (
 	golang.org/x/text v0.40.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260706201446-f0a921348800 // indirect
 )
-
-replace github.com/dnsgateway/dnsprovider => ../dnsprovider
