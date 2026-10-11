@@ -93,7 +93,7 @@ func TestRecordsCarryThePartialViewFlag(t *testing.T) {
 				Partial:    partial,
 			}}
 
-			got, err := adapterFor(t, gw).Records(t.Context(), dnsprovider.Zone{ID: "example.com", Name: "example.com"}, dnsprovider.RecordFilter{})
+			got, err := adapterFor(t, gw).ListRecords(t.Context(), dnsprovider.Zone{ID: "example.com", Name: "example.com"}, dnsprovider.RecordFilter{})
 			if err != nil {
 				t.Fatalf("Records: %v", err)
 			}
@@ -120,7 +120,7 @@ func TestZonesCarryThePartialViewFlag(t *testing.T) {
 				Partial: partial,
 			}}
 
-			got, err := adapterFor(t, gw).Zones(t.Context(), dnsprovider.ZoneFilter{})
+			got, err := adapterFor(t, gw).ListZones(t.Context(), dnsprovider.ZoneFilter{})
 			if err != nil {
 				t.Fatalf("Zones: %v", err)
 			}

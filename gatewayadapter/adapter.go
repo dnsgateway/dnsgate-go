@@ -72,6 +72,9 @@ func (a *adapter) learnProvider(name string) {
 	a.typ = &f
 }
 
+// Capabilities declares supported Zone writes.
+func (a *adapter) Capabilities() []dnsprovider.Capability { return nil }
+
 // providerType returns the Factory of the token's Provider type,
 // inspecting the token the first time, unless Account did, for at most
 // inspectTimeout. While the type is not known, it is the zero Factory:
