@@ -19,6 +19,7 @@ package gatewayadapter
 import (
 	"context"
 	"errors"
+	"slices"
 	"sync"
 	"time"
 
@@ -31,6 +32,11 @@ import (
 // adapter is the Gateway Adapter: a dnsprovider.Provider whose every call
 // is one Gateway request.
 type adapter struct {
+	dnsprovider.UnimplementedZoneWrites
+	dnsprovider.UnimplementedZoneDetails
+	dnsprovider.UnimplementedTenants
+	dnsprovider.UnimplementedDelegationSigners
+
 	client *client.Client
 	token  string
 	egress dnsgatev1.Egress
@@ -48,13 +54,11 @@ type adapter struct {
 	typ *dnsprovider.Factory
 }
 
-var (
-	_ dnsprovider.Provider  = (*adapter)(nil)
-	_ dnsprovider.Batcher   = (*adapter)(nil)
-	_ dnsprovider.TTLLimits = (*adapter)(nil)
-	_ dnsprovider.AutoTTL   = (*adapter)(nil)
-	_ dnsprovider.ProxyFlag = (*adapter)(nil)
-)
+var _ dnsprovider.Provider = (*adapter)(nil)
+
+// capabilities are the optional operations every Gateway Adapter, and its
+// Factory, declare: it applies a Changeset whole, and has no Zone writes.
+var capabilities = []dnsprovider.Capability{dnsprovider.CapBatcher}
 
 // inspectTimeout bounds the InspectToken call that learns the token's
 // Provider type.
@@ -71,9 +75,6 @@ func (a *adapter) learnProvider(name string) {
 
 	a.typ = &f
 }
-
-// Capabilities declares supported Zone writes.
-func (a *adapter) Capabilities() []dnsprovider.Capability { return nil }
 
 // providerType returns the Factory of the token's Provider type,
 // inspecting the token the first time, unless Account did, for at most
@@ -133,22 +134,12 @@ func answered(err error) bool {
 	return ok && gwErr.Detail() != nil
 }
 
-// TTLRange implements dnsprovider.TTLLimits: the TTL range of the token's
-// Provider type.
-func (a *adapter) TTLRange() (minTTL, maxTTL uint32) {
-	r := a.providerType(context.Background()).TTLRange()
+// Traits implements dnsprovider.Provider: the TTL range and Record
+// Extras of the token's Provider type, with the adapter's own
+// Capabilities.
+func (a *adapter) Traits() dnsprovider.Traits {
+	t := a.providerType(context.Background()).Traits.Clone()
+	t.Capabilities = slices.Clone(capabilities)
 
-	return r.Min, r.Max
-}
-
-// AutoTTL implements dnsprovider.AutoTTL: whether the token's Provider
-// type reads TTL 1 as automatic.
-func (a *adapter) AutoTTL() bool {
-	return a.providerType(context.Background()).TTLRange().Auto
-}
-
-// ProxiableTypes implements dnsprovider.ProxyFlag: the Record types the
-// token's Provider type can proxy, none for one that proxies nothing.
-func (a *adapter) ProxiableTypes() []string {
-	return a.providerType(context.Background()).ProxiableTypes()
+	return t
 }

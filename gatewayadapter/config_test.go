@@ -41,8 +41,8 @@ func TestFactoryDeclaresGatewayTokenAndEgress(t *testing.T) {
 		t.Errorf("Fields = %+v, want %+v", f.Fields, want)
 	}
 
-	if len(f.Capabilities) != 0 {
-		t.Errorf("Capabilities = %v, want none: the Gateway has no Zone writes", f.Capabilities)
+	if want := []dnsprovider.Capability{dnsprovider.CapBatcher}; !slices.Equal(f.Capabilities, want) {
+		t.Errorf("Capabilities = %v, want %v: the Gateway batches and has no Zone writes", f.Capabilities, want)
 	}
 }
 
@@ -57,7 +57,7 @@ func TestNewMakesNoNetworkCall(t *testing.T) {
 		t.Fatal("New returned no Provider")
 	}
 
-	if _, ok := p.(dnsprovider.Batcher); !ok {
+	if !dnsprovider.Can(p, dnsprovider.CapBatcher) {
 		t.Error("the Gateway Adapter is no Batcher")
 	}
 }

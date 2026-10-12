@@ -148,8 +148,8 @@ func WithProviders(r dnsprovider.Registry) Option {
 }
 
 // Factory builds Gateway Adapters from the fields FieldGateway,
-// FieldToken and FieldEgress, the last optional. It declares no Zone
-// writes: the Gateway has none. Its TTL and Record Extras are left
+// FieldToken and FieldEgress, the last optional. It declares CapBatcher
+// and no Zone writes: the Gateway has none. Its TTL and Record Extras are left
 // unset: they are those of each token's Provider type, which each
 // Gateway Adapter reports itself.
 func Factory(opts ...Option) dnsprovider.Factory {
@@ -162,6 +162,7 @@ func Factory(opts ...Option) dnsprovider.Factory {
 	}
 
 	return dnsprovider.Factory{
+		Traits: dnsprovider.Traits{Capabilities: slices.Clone(capabilities)},
 		Fields: slices.Clone(fields),
 		New: func(m map[string]string, popts ...dnsprovider.Option) (dnsprovider.Provider, error) {
 			m, err := checkFields(m)
